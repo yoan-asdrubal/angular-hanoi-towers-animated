@@ -1,0 +1,72 @@
+#options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  h2 {
+    margin-right: 20px;
+  }
+
+  button {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+#game {
+  min-height: 400px;
+  display: flex;
+  justify-content: space-around;
+}
+
+
+.column {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border-bottom: 3px solid black;
+
+  .disk {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: move;
+    border: solid 1px #ccc !important;
+    color: rgba(0, 0, 0, 0.87);
+    flex-direction: row;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.disk.cdk-drag-disabled {
+  //background: #ccc !important;
+  cursor: default !important;
+}
+
+.example-box:last-child {
+  border: none;
+}
+
+.column.cdk-drop-list-dragging .disk:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  cursor: pointer;
+}

@@ -1,0 +1,66 @@
+<div id="options">
+	<h2>{{simulationSteps.length > 0 ? simulationSteps.length : move}}</h2>
+	<mat-form-field floatPlaceholder="auto" appearance="outline">
+		<mat-label> Cantidad de discos</mat-label>
+		<input matInput [formControl]="diskFormControl"
+		       type="text">
+	</mat-form-field>
+	<button  mat-raised-button (click)="create()" color="primary">Create</button>
+	<mat-form-field floatPlaceholder="auto" appearance="outline">
+		<mat-label> Tiempo de animacion en ms</mat-label>
+		<input matInput [formControl]="timeToStep"
+		       type="number">
+	</mat-form-field>
+	<button  mat-raised-button (click)="simulateGame()" color="warn">Simulate</button>
+</div>
+
+<div id="game">
+
+	<div class="column"
+	     cdkDropList
+         #column1List="cdkDropList"
+	     [cdkDropListData]="column1"
+	     cdkDropListSortingDisabled
+	     [cdkDropListConnectedTo]="[column2List,  column3List]"
+	     (cdkDropListDropped)="drop($event)">
+
+		<ng-template ngFor [ngForOf]="column1" let-disk let-i="index">
+			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+		    'height.px':disk.height,
+		    'backgroundColor': disk.color
+		    }" cdkDrag [cdkDragDisabled]="i!==0 || winner">{{disk.nivel}} </div>
+		</ng-template>
+	</div>
+	<div class="column"
+	     cdkDropList
+         #column2List="cdkDropList"
+	     [cdkDropListData]="column2"
+	     cdkDropListSortingDisabled
+	     [cdkDropListConnectedTo]="[column1List,  column3List]"
+	     (cdkDropListDropped)="drop($event)">
+
+		<ng-template ngFor [ngForOf]="column2" let-disk let-i="index">
+			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+		    'height.px':disk.height,
+		    'backgroundColor': disk.color
+		    }" cdkDrag [cdkDragDisabled]="i!==0|| winner">{{disk.nivel}} </div>
+		</ng-template>
+	</div>
+
+	<div class="column" cdkDropList
+         #column3List="cdkDropList"
+	     [cdkDropListData]="column3"
+	     cdkDropListSortingDisabled
+	     [cdkDropListConnectedTo]="[column1List,  column2List]"
+	     (cdkDropListDropped)="drop($event)">
+
+		<ng-template ngFor [ngForOf]="column3" let-disk let-i="index">
+			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+		    'height.px':disk.height,
+		    'backgroundColor': disk.color
+		    }" cdkDrag [cdkDragDisabled]="i!==0 || winner">{{disk.nivel}} </div>
+		</ng-template>
+	</div>
+
+</div>
+
