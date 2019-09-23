@@ -32,16 +32,16 @@ export interface MoveData {
 export class GameComponent implements OnInit {
 
     /** Valores para la cantidad de discos y el tiempo de la animacion */
-    diskFormControl = new FormControl(8, Validators.required);
-    timeToStep = new FormControl(300, Validators.required);
+    discoFormControl = new FormControl(8, Validators.required);
+    tiempoAnimacionFormControl = new FormControl(300, Validators.required);
 
     /** Datos que estan en cada columna*/
-    column1: Disk[] = [];
-    column2: Disk[] = [];
-    column3: Disk[] = [];
+    columna1: Disk[] = [];
+    columna2: Disk[] = [];
+    columna3: Disk[] = [];
 
     /** Cantidad de movimientos pendientes */
-    move = 0;
+    movimientos = 0;
 
     /**  Ancho del disco mas grande    */
     baseWidth = 300;
@@ -56,18 +56,18 @@ export class GameComponent implements OnInit {
     heightRate = 30;
 
     /** Total de discos a utilizar, por defecto 8*/
-    totalDisk = 8;
+    totalDiscos = 8;
     /** Estado del problema*/
-    winner = false;
+    ganador = false;
 
     /** Historial de estados para utilizar en la simulacion de los pasos cuando lo resuelve la computadora*/
-    simulationSteps = [];
+    pasosSimulacion = [];
 
     constructor(private _snackBar: MatSnackBar, private changeDef: ChangeDetectorRef) {
     }
 
     ngOnInit() {
-        this.column1 = this.initGame(this.totalDisk);
+        this.columna1 = this.iniciarJuego(this.totalDiscos);
     }
 
     /**
@@ -76,7 +76,7 @@ export class GameComponent implements OnInit {
      * y la escala a utilizar para calcular la diferencia de tamaño entre discos
      * @param diskCount
      */
-    initGame(diskCount: number) {
+    iniciarJuego(diskCount: number) {
         const base = diskCount * this.baseRate > this.baseWidth ? this.baseWidth : diskCount * this.baseRate;
         const top = diskCount * this.topRate > this.topWidth ? this.topWidth : diskCount * this.topRate;
         const height = this.height / diskCount > this.heightRate ? this.heightRate : this.height / diskCount;
@@ -84,14 +84,14 @@ export class GameComponent implements OnInit {
 
         return Array(diskCount)
             .fill(1)
-            .map((x, i) => ({width: base - i * rate, height, color: this.generateColor(), nivel: diskCount - i}))
+            .map((x, i) => ({width: base - i * rate, height, color: this.generarColor(), nivel: diskCount - i}))
             .reverse();
     }
 
     /**
      * Genera un color aleatoro en hexadecimal
      */
-    generateColor() {
+    generarColor() {
         return '#' + Math.floor(Math.random() * 16777215).toString(16);
     }
 
@@ -108,8 +108,8 @@ export class GameComponent implements OnInit {
                         event.container.data,
                         0,
                         0);
-                    this.move++;
-                    this.checkWinner(event.container.data);
+                    this.movimientos++;
+                    this.chequeaGanador(event.container.data);
                 }
             }
         }
@@ -119,30 +119,30 @@ export class GameComponent implements OnInit {
      * Crea un juego utilizando la cantidad de discos especificadas en el campo para ello, o en caso de que no
      * exista utiliza la ultima cantidad de discos utilizada.
      */
-    create() {
-        let diskCount = this.totalDisk;
-        if (this.diskFormControl.valid) {
-            diskCount = this.diskFormControl.value;
+    crear() {
+        let diskCount = this.totalDiscos;
+        if (this.discoFormControl.valid) {
+            diskCount = this.discoFormControl.value;
         }
-        this.totalDisk = parseInt(diskCount.toString());
-        this.column1 = this.initGame(this.totalDisk);
-        this.column2 = [];
-        this.column3 = [];
-        this.simulationSteps = [];
-        this.winner = false;
-        this.move = 0;
+        this.totalDiscos = parseInt(diskCount.toString());
+        this.columna1 = this.iniciarJuego(this.totalDiscos);
+        this.columna2 = [];
+        this.columna3 = [];
+        this.pasosSimulacion = [];
+        this.ganador = false;
+        this.movimientos = 0;
     }
 
     /**
      * Chequea si se ha resuelto el algoritmo correctamente
      * @param column
      */
-    checkWinner(column: any[] = this.column3) {
-        if (this.totalDisk === column.length) {
+    chequeaGanador(column: any[] = this.columna3) {
+        if (this.totalDiscos === column.length) {
             this._snackBar.open('You Win!!!', '', {verticalPosition: 'top', duration: 3000});
-            this.winner = true;
+            this.ganador = true;
         } else {
-            this.winner = false;
+            this.ganador = false;
         }
     }
 
@@ -150,13 +150,13 @@ export class GameComponent implements OnInit {
      * Resuelve automaticamente un caso del algoritmo, para ello lo crea nuevamente, determina la solucion
      * correspondiente y luego anima la solucion segun el historial de pasos almacenados  en el proceso
      */
-    simulateGame() {
-        this.create();
-        this.moverTorre(this.totalDisk,
-            {name: 'column1', data: this.column1.slice()},
-            {name: 'column3', data: this.column3.slice()},
-            {name: 'column2', data: this.column2.slice()});
-        this.animateSimulation();
+    resolverJuego() {
+        this.crear();
+        this.moverTorre(this.totalDiscos,
+            {name: 'columna1', data: this.columna1.slice()},
+            {name: 'columna3', data: this.columna3.slice()},
+            {name: 'columna2', data: this.columna2.slice()});
+        this.animarSolucion();
     }
 
     /** Mueve los discos de la torre origen a la torre destino */
@@ -180,7 +180,7 @@ export class GameComponent implements OnInit {
         step[hacia.name] = hacia.data.slice();
         step[medio.name] = medio.data.slice();
 
-        this.simulationSteps.push(step);
+        this.pasosSimulacion.push(step);
         // console.log('mover hacia ', step);
     }
 
@@ -188,21 +188,21 @@ export class GameComponent implements OnInit {
      * Realiza la animacion de un paso, y recursivamente mientras queden pasos pendientes
      * en el historial anima los restantes
      */
-    animateSimulation() {
+    animarSolucion() {
         setTimeout(() => {
-            const {column1, column2, column3} = this.simulationSteps[0];
-            this.simulationSteps.splice(0, 1);
-            this.column1 = column1;
-            this.column2 = column2;
-            this.column3 = column3;
-            this.move++;
+            const {columna1, columna2, columna3} = this.pasosSimulacion[0];
+            this.pasosSimulacion.splice(0, 1);
+            this.columna1 = columna1;
+            this.columna2 = columna2;
+            this.columna3 = columna3;
+            this.movimientos++;
             this.changeDef.markForCheck();
 
-            if (this.simulationSteps.length > 0) {
-                this.animateSimulation();
+            if (this.pasosSimulacion.length > 0) {
+                this.animarSolucion();
             } else {
-                this.checkWinner();
+                this.chequeaGanador();
             }
-        }, this.timeToStep.value || 1000);
+        }, this.tiempoAnimacionFormControl.value || 1000);
     }
 }
