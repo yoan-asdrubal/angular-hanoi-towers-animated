@@ -1,66 +1,66 @@
 <div id="options">
-	<h2>{{pasosSimulacion.length > 0 ? pasosSimulacion.length : movimientos}}</h2>
-	<mat-form-field floatPlaceholder="auto" appearance="outline">
-		<mat-label> Cantidad de discos</mat-label>
-		<input matInput [formControl]="discoFormControl"
-		       type="text">
-	</mat-form-field>
-	<button mat-raised-button (click)="crear()" color="primary">Crear</button>
-	<mat-form-field floatPlaceholder="auto" appearance="outline">
-		<mat-label> Tiempo de animacion en ms</mat-label>
-		<input matInput [formControl]="tiempoAnimacionFormControl"
-		       type="number">
-	</mat-form-field>
-	<button  mat-raised-button (click)="resolverJuego()" color="warn">Resolver</button>
+  <h2>{{pasosSimulacion.length > 0 ? pasosSimulacion.length : movimientos}}</h2>
+  <mat-form-field floatPlaceholder="auto" appearance="outline">
+    <mat-label> Cantidad de discos</mat-label>
+    <input matInput [formControl]="discoFormControl"
+           type="text">
+  </mat-form-field>
+  <button mat-raised-button (click)="crear()" color="primary">{{movimientos > 0 ? 'Resetear' : 'Crear'}}</button>
+  <mat-form-field floatPlaceholder="auto" appearance="outline">
+    <mat-label> Tiempo de animacion en ms</mat-label>
+    <input matInput [formControl]="tiempoAnimacionFormControl"
+           type="number">
+  </mat-form-field>
+  <button mat-raised-button (click)="resolverJuego()" color="warn">Resolver</button>
 </div>
 
 <div id="game">
 
-	<div class="column"
-	     cdkDropList
-         #column1List="cdkDropList"
-	     [cdkDropListData]="columna1"
-	     cdkDropListSortingDisabled
-	     [cdkDropListConnectedTo]="[column2List,  column3List]"
-	     (cdkDropListDropped)="drop($event)">
+  <div class="column"
+       cdkDropList
+       #column1List="cdkDropList"
+       [cdkDropListData]="columna1"
+       cdkDropListSortingDisabled
+       [cdkDropListConnectedTo]="[column2List,  column3List]"
+       (cdkDropListDropped)="drop($event)">
 
-		<ng-template ngFor [ngForOf]="columna1" let-disk let-i="index">
-			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+    <ng-template ngFor [ngForOf]="columna1" let-disk [ngForTrackBy]="trackByFn" let-i="index">
+      <div [@fadeInOut] class="disk" [ngStyle]="{'width.px':disk.width,
 		    'height.px':disk.height,
 		    'backgroundColor': disk.color
 		    }" cdkDrag [cdkDragDisabled]="i!==0 || ganador">{{disk.nivel}} </div>
-		</ng-template>
-	</div>
-	<div class="column"
-	     cdkDropList
-         #column2List="cdkDropList"
-	     [cdkDropListData]="columna2"
-	     cdkDropListSortingDisabled
-	     [cdkDropListConnectedTo]="[column1List,  column3List]"
-	     (cdkDropListDropped)="drop($event)">
+    </ng-template>
+  </div>
+  <div class="column"
+       cdkDropList
+       #column2List="cdkDropList"
+       [cdkDropListData]="columna2"
+       cdkDropListSortingDisabled
+       [cdkDropListConnectedTo]="[column1List,  column3List]"
+       (cdkDropListDropped)="drop($event)">
 
-		<ng-template ngFor [ngForOf]="columna2" let-disk let-i="index">
-			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+    <ng-template ngFor [ngForOf]="columna2" let-disk let-i="index" [ngForTrackBy]="trackByFn">
+      <div [@fadeInOut] class="disk" [ngStyle]="{'width.px':disk.width,
 		    'height.px':disk.height,
 		    'backgroundColor': disk.color
 		    }" cdkDrag [cdkDragDisabled]="i!==0|| ganador">{{disk.nivel}} </div>
-		</ng-template>
-	</div>
+    </ng-template>
+  </div>
 
-	<div class="column" cdkDropList
-         #column3List="cdkDropList"
-	     [cdkDropListData]="columna3"
-	     cdkDropListSortingDisabled
-	     [cdkDropListConnectedTo]="[column1List,  column2List]"
-	     (cdkDropListDropped)="drop($event)">
+  <div class="column" cdkDropList
+       #column3List="cdkDropList"
+       [cdkDropListData]="columna3"
+       cdkDropListSortingDisabled
+       [cdkDropListConnectedTo]="[column1List,  column2List]"
+       (cdkDropListDropped)="drop($event)">
 
-		<ng-template ngFor [ngForOf]="columna3" let-disk let-i="index">
-			<div @slideInOut class="disk" [ngStyle]="{'width.px':disk.width,
+    <ng-template ngFor [ngForOf]="columna3" let-disk let-i="index">
+      <div [@fadeInOut] class="disk" [ngStyle]="{'width.px':disk.width,
 		    'height.px':disk.height,
 		    'backgroundColor': disk.color
 		    }" cdkDrag [cdkDragDisabled]="i!==0 || ganador">{{disk.nivel}} </div>
-		</ng-template>
-	</div>
+    </ng-template>
+  </div>
 
 </div>
 
